@@ -1,13 +1,11 @@
 export default class Ball {
   constructor (x, y, radius) {
-    this.origX = x
-    this.origY = y
-
-    this.reset()
-
-    // this.angle = Math.random() * Math.PI * 2
+    this.origX = this.oldX = x
+    this.origY = this.oldY = y
     this.r = radius
     this.speed = 0.2
+
+    this.reset()
   }
 
   reset () {
@@ -16,7 +14,27 @@ export default class Ball {
     this.angle = (Math.random() * (Math.PI / 2)) + (Math.PI / 4)
   }
 
-  checkHits (paddle) {
+  checkHitsBrick (level, debug) {
+    for (let i = level.bricks.length - 1; i >= 0; i--) {
+      const brick = level.bricks[i]
+
+      const oldInsideX = this.oldX + this.r > brick.x && this.oldX - this.r < brick.x + brick.size
+      const oldInsideY = this.oldY + this.r > brick.y && this.oldY - this.r < brick.y + brick.size
+      const insideX = this.x + this.r > brick.x && this.x - this.r < brick.x + brick.size
+      const insideY = this.y + this.r > brick.y && this.y - this.r < brick.y + brick.size
+
+      if (insideX && insideY) {
+        if (!debug) {
+          if (!oldInsideX) this.invertX()
+          if (!oldInsideY) this.invertY()
+        }
+        level.bricks.splice(i, 1)
+        return
+      }
+    }
+  }
+
+  checkHitsPaddle (paddle) {
     const offset = this.x - paddle.x
     if (
       // is ball on the bottom ?
@@ -26,10 +44,15 @@ export default class Ball {
       offset + this.r >= -paddle.size / 2 &&
       offset - this.r <= paddle.size / 2
     ) {
+      // we make a new angle based on the spot the ball hit the paddle
       const normOffset = offset / (paddle.size / 2)
-      // console.log('hits', offset / (paddle.size / 2))
-      // this.invertY()
       this.angle = (normOffset * Math.PI / 4) - Math.PI / 2
+      console.log('hit paddle')
+      return true
+    } else {
+      console.log('no hit paddle')
+      this.reset()
+      return false
     }
   }
 
@@ -41,6 +64,8 @@ export default class Ball {
   }
 
   update (elapsedTime, w, h) {
+    this.oldX = this.x
+    this.oldY = this.y
     const oX = Math.cos(this.angle) * this.speed * elapsedTime
     const oY = Math.sin(this.angle) * this.speed * elapsedTime
 
@@ -51,12 +76,8 @@ export default class Ball {
     if (newX - this.r < 0) this.invertX()
     if (newY - this.r < 0) this.invertY()
 
-    if (newY - this.r > h) {
-      this.reset()
-    } else {
-      this.x = newX
-      this.y = newY
-    }
+    this.x = newX
+    this.y = newY
   }
 
   draw (ctx) {
