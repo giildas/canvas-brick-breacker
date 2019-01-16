@@ -75,7 +75,11 @@ class BrickBreaker extends Game {
     this.ctx.textBaseline = 'alphabetic'
     this.ctx.font = '10px sans-serif'
     // fps: ${Math.round(1000 / elapsedTime)} -
-    this.ctx.fillText(`Level: ${this.levelNb + 1}/${levels.length} - Lives: ${this.lives}/3 - Gamestate: ${this.gameState}`, 15, 15)
+
+    this.ctx.fillText(`Level: ${this.levelNb + 1}/${levels.length}`, 15, 15)
+    this.ctx.textAlign = 'right'
+    const lifetext = '❤︎️'.repeat(this.lives)
+    this.ctx.fillText(lifetext, this.w - 15, 15)
 
     this.paddle.draw(this.ctx)
     if (this.level) this.level.draw(this.ctx)
@@ -89,25 +93,25 @@ class BrickBreaker extends Game {
       switch (this.gameState) {
         case GAME_IS.UNSTARTED:
           text = 'Appuyer sur "espace" pour commencer'
-          this.ctx.font = '18px sans-serif'
+          this.ctx.font = '10px sans-serif'
           this.ctx.fillText(text, this.w / 2, this.h / 2)
           break
         case GAME_IS.PAUSED:
           this.ctx.font = '18px sans-serif'
           this.ctx.fillText('Pause', this.w / 2, this.h / 2)
-          this.ctx.font = '12px sans-serif'
+          this.ctx.font = '10px sans-serif'
           this.ctx.fillText('Appuyer sur "espace" pour reprendre', this.w / 2, this.h / 2 + 15)
           break
         case GAME_IS.FINISHED:
           this.ctx.font = '18px sans-serif'
           this.ctx.fillText('Félicitations !', this.w / 2, this.h / 2)
-          this.ctx.font = '12px sans-serif'
+          this.ctx.font = '10px sans-serif'
           this.ctx.fillText('Appuyer sur "espace" pour recommencer', this.w / 2, this.h / 2 + 15)
           break
         case GAME_IS.LOST:
           this.ctx.font = '18px sans-serif'
-          this.ctx.fillText('Pas de chance !', this.w / 2, this.h / 2)
-          this.ctx.font = '12px sans-serif'
+          this.ctx.fillText('Perdu !', this.w / 2, this.h / 2)
+          this.ctx.font = '10px sans-serif'
           this.ctx.fillText('Appuyer sur "espace" pour recommencer', this.w / 2, this.h / 2 + 15)
           break
       }
@@ -124,7 +128,7 @@ class BrickBreaker extends Game {
       this.ball.checkHitsBrick(this.level, OPTIONS.debug)
     }
 
-    if (this.lives < 0) {
+    if (this.lives <= 0) {
       this.gameState = GAME_IS.LOST
       this.ball.reset()
     }
