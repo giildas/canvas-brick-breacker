@@ -47,11 +47,19 @@ export default class Ball {
       // we make a new angle based on the spot the ball hit the paddle
       const normOffset = offset / (paddle.size / 2)
       this.angle = (normOffset * Math.PI / 4) - Math.PI / 2
-      console.log('hit paddle')
+    }
+  }
+
+  checkOutOfScreen (w, h) {
+    if (this.y - 50 > h) { // - 50 == gives delay
+      this.reset()
+      console.log('out of screen')
       return true
     } else {
-      console.log('no hit paddle')
-      this.reset()
+      console.log('in the screen')
+      if (this.x + this.r > w) this.invertX()
+      if (this.x - this.r < 0) this.invertX()
+      if (this.y - this.r < 0) this.invertY()
       return false
     }
   }
@@ -63,7 +71,7 @@ export default class Ball {
     this.angle = -this.angle
   }
 
-  update (elapsedTime, w, h) {
+  update (elapsedTime) {
     this.oldX = this.x
     this.oldY = this.y
     const oX = Math.cos(this.angle) * this.speed * elapsedTime
@@ -72,16 +80,12 @@ export default class Ball {
     const newX = this.x + oX
     const newY = this.y + oY
 
-    if (newX + this.r > w) this.invertX()
-    if (newX - this.r < 0) this.invertX()
-    if (newY - this.r < 0) this.invertY()
-
     this.x = newX
     this.y = newY
   }
 
   draw (ctx) {
-    ctx.fillStyle = '#FF0'
+    ctx.fillStyle = '#FFF'
     ctx.beginPath()
     ctx.ellipse(this.x, this.y, this.r, this.r, 0, 0, Math.PI * 2)
     ctx.fill()
